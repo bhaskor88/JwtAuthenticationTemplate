@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -14,6 +15,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 /**
  * JwtUtil
  */
+@Service
 public class JwtUtil {
 
     private String SECRET_KEY = "secret";
@@ -44,6 +46,7 @@ public class JwtUtil {
         Map<String, Object> claims = new HashMap<>();
 
         // TODO: Add to claims any data required to be saved in the payload
+        // claims.put("role", userDetails.getUsername())
 
         return createToken(claims, userDetails.getUsername());
     }
