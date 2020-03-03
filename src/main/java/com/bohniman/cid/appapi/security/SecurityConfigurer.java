@@ -56,25 +56,18 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable()
-            .authorizeRequests().antMatchers("/public/**").permitAll()
-            .anyRequest().authenticated()
-            .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.csrf().disable().authorizeRequests().antMatchers("/public/**").permitAll().anyRequest().authenticated()
+                .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
-        http
-            .exceptionHandling()
-            .authenticationEntryPoint((request, response, e) -> 
-            {
-                response.setContentType("application/json;charset=UTF-8");
-                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                response.getWriter().write(new JSONObject() 
-                        .put("timestamp", LocalDateTime.now())
-                        .put("message", "Access denied")
-                        .toString());
-            });
+        // http.exceptionHandling().authenticationEntryPoint((request, response, e) -> {
+        // response.setContentType("application/json;charset=UTF-8");
+        // response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+        // response.getWriter().write(
+        // new JSONObject().put("timestamp", LocalDateTime.now()).put("message", "Access
+        // denied").toString());
+        // });
     }
-
 
 }

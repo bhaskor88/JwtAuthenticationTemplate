@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import com.bohniman.cid.appapi.exception.CustomException;
+import com.bohniman.cid.appapi.exception.CommonException;
 import com.bohniman.cid.appapi.model.Role;
 import com.bohniman.cid.appapi.model.User;
 import com.bohniman.cid.appapi.repository.RoleRepository;
@@ -43,26 +43,26 @@ public class UserService {
             // Find if role exist, if not throw exception
             Set<Role> roleList = new HashSet<Role>();
             if (null == newUser.getRoles())
-                throw new CustomException("Empty role list provided");
+                throw new CommonException("Empty role list provided");
             for (Role r : newUser.getRoles()) {
                 Optional<Role> foundRole = roleRepository.findById(r.getRoleid());
                 if (!foundRole.isPresent())
-                    throw new CustomException("Role not Found");
+                    throw new CommonException("Role not Found");
                 roleList.add(foundRole.get());
             }
             if (roleList.size() == 0) {
-                throw new CustomException("Empty role list provided");
+                throw new CommonException("Empty role list provided");
             }
             // Password and Confirmpassword match
             // Not to persist confirmpassword
             newUser.setRoles(roleList);
             return userRepository.save(newUser);
-        } catch (CustomException e) {
-            throw new CustomException(e.getMessage());
+        } catch (CommonException e) {
+            throw new CommonException(e.getMessage());
         } catch (IllegalArgumentException | InvalidDataAccessApiUsageException | NullPointerException e) {
-            throw new CustomException("Some error has ocurred ! Please verify the JSON format.");
+            throw new CommonException("Some error has ocurred ! Please verify the JSON format.");
         } catch (Exception e) {
-            throw new CustomException("Username already exist");
+            throw new CommonException("Username already exist");
         }
 
     }

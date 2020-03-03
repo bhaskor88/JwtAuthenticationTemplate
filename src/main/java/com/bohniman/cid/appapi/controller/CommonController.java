@@ -48,32 +48,16 @@ public class CommonController {
     @Autowired
     private UserValidator userValidator;
 
-    @RequestMapping(value="/authenticate", method = RequestMethod.POST)
-    public ResponseEntity<?> registerUser(@Valid @RequestBody AuthenticationRequest authenticationRequest, BindingResult result) throws Exception{
-        try {
-            authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(), authenticationRequest.getPassword())
-            );
-        } catch (Exception e) {
-            throw new Exception("Incorrect Username and Password", e);
-        }
-        
-        final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
-
-        final String jwtToken = jwtUtil.generateToken(userDetails);
-
-        return ResponseEntity.ok(new AuthenticationResponse(jwtToken));
-    }
-
-    @RequestMapping(value="/register", method = RequestMethod.POST)
-    public ResponseEntity<?> createAuthenticationToken(@Valid @RequestBody User user, BindingResult result) throws Exception{
+    @RequestMapping(value = "/register", method = RequestMethod.POST)
+    public ResponseEntity<?> createAuthenticationToken(@Valid @RequestBody User user, BindingResult result)
+            throws Exception {
         // Expecting an User Model at authenticationRequest
         userValidator.validate(user, result);
 
         ResponseEntity<?> errorMap = mapValidationErrorService.MapValidationService(result);
         if (errorMap != null)
             return errorMap;
-
+        user.setIsEnabled("1");
         User newUser = userService.saveUser(user);
         // for (Role r : newUser.getRoles()) {
         // System.out.println(r.getRolename());
@@ -81,6 +65,23 @@ public class CommonController {
         // newUser.setConfirmPassword("");
         // newUser.setRoles(null);
         return new ResponseEntity<User>(newUser, HttpStatus.CREATED);
+    }
+
+    @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
+    public ResponseEntity<?> registerUser(@Valid @RequestBody AuthenticationRequest authenticationRequest,
+            BindingResult result) throws Exception {
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                    authenticationRequest.getUsername(), authenticationRequest.getPassword()));
+        } catch (Exception e) {
+            throw new Exception("Incorrect Username and Password", e);
+        }
+
+        final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
+
+        final String jwtToken = jwtUtil.generateToken(userDetails);
+
+        return ResponseEntity.ok(new AuthenticationResponse(jwtToken));
     }
 
 }
